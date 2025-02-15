@@ -26,7 +26,7 @@ RDEPEND="
     dev-qt/qtimageformats:6
     dev-qt/qtsvg:6
     media-libs/libavif
-    llvm? ( sys-devel/clang sys-devel/llvm )
+    llvm? ( llvm-core/clang llvm-core/llvm )
 "
 
 DEPEND="${RDEPEND}"
