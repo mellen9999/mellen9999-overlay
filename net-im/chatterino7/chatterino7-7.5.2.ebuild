@@ -4,13 +4,12 @@
 EAPI=8
 IUSE="llvm"
 
-# Inherit CMake and Git eclasses
 inherit cmake git-r3
 
 DESCRIPTION="Chat client for Twitch.tv"
 HOMEPAGE="https://chatterino.com"
 EGIT_REPO_URI="https://github.com/SevenTV/chatterino7.git"
-EGIT_COMMIT="v${PV}"  # Verify that Git tags match your version
+EGIT_COMMIT="v${PV}"
 
 LICENSE="MIT"
 SLOT="0"
@@ -30,10 +29,8 @@ RDEPEND="
     llvm? ( sys-devel/clang sys-devel/llvm )
 "
 
-# Use the same dependency list for build and runtime
 DEPEND="${RDEPEND}"
 
-# Build-time dependencies: note the update below!
 BDEPEND="
     dev-vcs/git
     dev-build/cmake
@@ -56,7 +53,6 @@ src_configure() {
         NM="llvm-nm"
         RANLIB="llvm-ranlib"
     else
-        # Disable LTO for GCC
         CFLAGS="${CFLAGS} -fno-lto"
         CXXFLAGS="${CXXFLAGS} -fno-lto"
         LDFLAGS="${LDFLAGS} -fno-lto"
@@ -65,4 +61,3 @@ src_configure() {
 
     cmake_src_configure "${mycmakeargs[@]}"
 }
-
