@@ -43,7 +43,6 @@ src_configure() {
         -DUSE_SYSTEM_LIBCOMMUNI=OFF
         -DUSE_SYSTEM_QTKEYCHAIN=OFF
         -DUSE_SYSTEM_PAJLADA_SETTINGS=OFF
-        -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF
     )
 
     if use llvm; then
