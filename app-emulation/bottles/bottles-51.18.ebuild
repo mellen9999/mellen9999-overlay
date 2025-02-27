@@ -11,11 +11,11 @@ KEYWORDS="~amd64"
 IUSE=""
 
 DEPEND="
-  x11-libs/gtk+:4
+  gui-libs/gtk:4
   dev-libs/json-glib
-  dev-libs/libadwaita
+  gui-libs/libadwaita
   dev-libs/libpeas
-  dev-libs/libsecret
+  app-crypt/libsecret
   x11-libs/libnotify
   dev-libs/libzip
   net-misc/curl
@@ -23,8 +23,8 @@ DEPEND="
 
 RDEPEND="${DEPEND}"
 BDEPEND="
-  dev-util/meson
-  dev-util/ninja
+  dev-build/meson
+  dev-build/ninja
 "
 
 S="${WORKDIR}/Bottles-51.18"
