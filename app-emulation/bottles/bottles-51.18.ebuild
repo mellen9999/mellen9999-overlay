@@ -5,7 +5,7 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{10..12} )
 
-inherit meson python-single-r1
+inherit meson python-single-r1 xdg
 
 DESCRIPTION="A graphical user interface to manage Wine prefixes"
 HOMEPAGE="https://usebottles.com/"
@@ -19,16 +19,18 @@ IUSE=""
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 DEPEND="
-    gui-libs/gtk:4
+    >=gui-libs/gtk-4.10:4[introspection]
+    >=gui-libs/libadwaita-1.2:1[introspection]
     dev-libs/json-glib
-    gui-libs/libadwaita
     dev-libs/libpeas
     app-crypt/libsecret
     x11-libs/libnotify
     dev-libs/libzip
     net-misc/curl
-    gui-libs/gtksourceview:5
-    dev-libs/libportal[introspection]
+    >=gui-libs/gtksourceview-5.0:5
+    >=dev-libs/libportal-0.6[introspection]
+    x11-libs/cairo
+    x11-libs/pango
     ${PYTHON_DEPS}
 "
 RDEPEND="${DEPEND}
@@ -42,17 +44,19 @@ RDEPEND="${DEPEND}
         dev-python/pathvalidate[${PYTHON_USEDEP}]
         dev-python/pyyaml[${PYTHON_USEDEP}]
         dev-python/requests[${PYTHON_USEDEP}]
-        dev-python/pygobject[${PYTHON_USEDEP}]
+        >=dev-python/pygobject-3.44:3[${PYTHON_USEDEP}]
     ')
     media-gfx/vkBasalt
     sys-apps/xdg-desktop-portal
     sys-apps/xdg-desktop-portal-gtk
+    virtual/wine
 "
 BDEPEND="
     dev-build/meson
     dev-build/ninja
     dev-util/glib-utils
-    gui-libs/gtk:4[introspection]
+    >=gui-libs/gtk-4.10:4[introspection]
+    dev-libs/gobject-introspection
 "
 
 S="${WORKDIR}/Bottles-51.18"
@@ -63,53 +67,69 @@ pkg_setup() {
 
 src_prepare() {
     default
-    # Stub out vkbasalt import since it’s not in 51.18
-    sed -i 's/from vkbasalt.lib import parse, ParseConfig/# Stubbed vkbasalt import/' "${S}/bottles/frontend/windows/vkbasalt.py" || die
-    echo "def parse(*args, **kwargs): return None" >> "${S}/bottles/frontend/windows/vkbasalt.py" || die
-    echo "class ParseConfig: pass" >> "${S}/bottles/frontend/windows/vkbasalt.py" || die
-    # Replace @BASE_ID@ globally
-    find "${S}" -type f -name "*.py" -exec sed -i 's/@BASE_ID@/com.usebottles.bottles/g' {} + || die
-    # Patch window.py sandbox check - silence all logs and bypass exit
-    sed -i '/if not Xdp\.Portal\.running_under_sandbox():/,+22 s/if not Xdp\.Portal\.running_under_sandbox():\n\s*def response(dialog, response, \*args):\n\s*if response == "close":\n\s*quit(1)\n.*body = _(\n\s*"Bottles is only supported within a sandboxed environment.*\n\s*download_url = "usebottles.com\/download"\n.*error_dialog = Adw\.AlertDialog\.new(\n\s*_("Unsupported Environment"),\n\s*f"{body} <a href=.*\n\s*error_dialog\.add_response.*\n\s*error_dialog\.set_body_use_markup.*\n\s*error_dialog\.connect.*\n\s*error_dialog\.present.*\n\s*logging\.error.*\n\s*logging\.error.*\n\s*return/if True: # Bypassed sandbox check for native execution\n            logging.info("Running natively - sandbox check skipped")\n            pass/' "${S}/bottles/frontend/windows/window.py" && einfo "Patched window.py sandbox check" || die "Failed to patch window.py"
-    # Replace all sandbox error logs globally - match exact strings
-    find "${S}" -type f -name "*.py" -exec sed -i '/logging\.error.*"Bottles is only supported within a sandboxed environment.*/s/logging\.error/logging.info/' {} + || die
-    find "${S}" -type f -name "*.py" -exec sed -i '/logging\.error.*"https:\/\/usebottles\.com\/download/s/logging\.error/logging.info/' {} + || die
-    # Fix GLib app ID assertion
-    sed -i 's/Gtk\.Application.__init__(self)/Gtk.Application.__init__(self, application_id="com.usebottles.bottles")/' "${S}/bottles/frontend/windows/window.py" || die "Failed to set application ID"
-    # Replace all quit and sys.exit calls as a safety net
-    find "${S}" -type f -name "*.py" -exec sed -i 's/quit([0-1])/logging.info("Quit call bypassed")/' {} + || die
-    find "${S}" -type f -name "*.py" -exec sed -i 's/sys\.exit([0-1])/logging.info("Exit call bypassed")/' {} + || die
-    find "${S}" -type f -name "*.py" -exec sed -i '/show_error_dialog/s/show_error_dialog.*$/logging.info("Dialog bypassed")/' {} + || die
+    # Remove vkbasalt import and add stubs at the top
+    sed -i '/from vkbasalt\.lib import parse, ParseConfig/d' "${S}/bottles/frontend/windows/vkbasalt.py" || die
+    sed -i '1i\
+# Stubbed vkbasalt functions for native build\n\
+def parse(*args, **kwargs):\n\
+    return None\n\
+\n\
+class ParseConfig:\n\
+    pass\n\
+' "${S}/bottles/frontend/windows/vkbasalt.py" || die
+    # Replace @BASE_ID@ in frontend only
+    find "${S}/bottles/frontend" -type f -name "*.py" -exec sed -i 's/@BASE_ID@/com.usebottles.bottles/g' {} + || die
+    # Completely bypass sandbox check and dialog
+    sed -i '/if not Xdp\.Portal\.running_under_sandbox():/,/return/c\        # Sandbox check bypassed for native execution\n        logging.info("Running natively, skipping sandbox check")' "${S}/bottles/frontend/windows/window.py" || die
+    # Robustly set GLib app ID and log it
+    sed -i 's/Gtk\.Application.__init__(self)/Gtk.Application.__init__(self, application_id="com.usebottles.bottles"); logging.info("Application ID set to com.usebottles.bottles")/' "${S}/bottles/frontend/windows/window.py" || die
+    # Add debug log before quitting and bottle creation
+    find "${S}/bottles/frontend" -type f -name "*.py" -exec sed -i 's/^\([[:space:]]*\)quit(/\1logging.info("Quitting application")\n\1quit(/g' {} + || die
+    find "${S}/bottles/frontend" -type f -name "*.py" -exec sed -i 's/^\([[:space:]]*\)sys\.exit(/\1logging.info("Exiting via sys.exit")\n\1sys.exit(/g' {} + || die
+    sed -i '/def create_bottle(self,/a\        logging.info("Starting bottle creation...")' "${S}/bottles/frontend/operation.py" || die
+    sed -i '/self\.runner\.create_bottle/a\        logging.info("Bottle creation completed or failed")' "${S}/bottles/frontend/operation.py" || die
+    # Patch Adw.WrapBox to Gtk.Box for older libadwaita compatibility
+    sed -i 's/Adw\.WrapBox/Gtk\.Box/' "${S}/bottles/frontend/ui/bottle-row.blp" || die
+    sed -i '/<object class="Gtk\.Box" id="wrap_box">/a\    <property name="orientation">horizontal</property>\n    <property name="spacing">6</property>' "${S}/bottles/frontend/ui/bottle-row.blp" || die
 }
 
 src_configure() {
     sed -i "s/error('file does not exist')/#error('file does not exist')/" "${S}/bottles/frontend/meson.build" || die
-    sed -i 's/Adw\.WrapBox/Gtk\.Box/' "${S}/bottles/frontend/ui/bottle-row.blp" || die
-    sed -i '/<object class="Gtk\.Box" id="wrap_box">/a\    <property name="orientation">horizontal</property>\n    <property name="spacing">6</property>' "${S}/bottles/frontend/ui/bottle-row.blp" || die
-    meson setup "${S}" "${WORKDIR}/${P}-build" --prefix=/usr
+    meson setup "${S}" "${WORKDIR}/${P}-build" --prefix=/usr || die "Meson setup failed"
 }
 
 src_compile() {
-    ninja -C "${WORKDIR}/${P}-build"
+    ninja -v -C "${WORKDIR}/${P}-build" || die "Ninja compile failed"
 }
 
 src_install() {
-    meson install -C "${WORKDIR}/${P}-build" --destdir="${D}"
+    meson install -C "${WORKDIR}/${P}-build" --destdir="${D}" || die "Meson install failed"
     dodir /usr/share/bottles/bottles
     einfo "Copying bottles directory contents to /usr/share/bottles/bottles/"
     cp -rv "${S}/bottles/"* "${D}/usr/share/bottles/bottles/" || die "Failed to copy bottles directory contents"
     python_optimize "${D}/usr/share/bottles/bottles"
+    # Clean up any logging.info patches in the installed bottles script
+    einfo "Cleaning /usr/bin/bottles of stray logging patches"
+    sed -i '/logging\.info("Exiting via sys\.exit")/d' "${D}/usr/bin/bottles" || die "Failed to clean bottles script"
+    sed -i '/logging\.info("Quitting application")/d' "${D}/usr/bin/bottles" || die "Failed to clean bottles script"
     python_fix_shebang "${D}/usr/bin/bottles"
     dodir /usr/share/glib-2.0/schemas
     einfo "Copying GSchema to /usr/share/glib-2.0/schemas/"
     cp -v "${S}/data/com.usebottles.bottles.gschema.xml" "${D}/usr/share/glib-2.0/schemas/" || die "Failed to copy GSchema"
-    gtk4-update-icon-cache -f -t "${D}/usr/share/icons/hicolor" || einfo "gtk4-update-icon-cache failed, icons may not update"
+    # Install icons without cache update in sandbox
+    einfo "Installing icons to /usr/share/icons/hicolor/"
+    cp -rv "${S}/data/icons/hicolor/"* "${D}/usr/share/icons/hicolor/" || die "Failed to copy icons"
 }
 
 pkg_postinst() {
+    xdg_pkg_postinst
+    einfo "Updating icon cache on live system..."
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor || einfo "Failed to update icon cache - ensure gui-libs/gtk:4 is fully installed"
     einfo "Ensure your system's active Python version matches the one used by Bottles."
     einfo "Run 'eselect python list' to check, and 'eselect python set python3.12' if needed."
     einfo "Compiling GSettings schemas..."
-    glib-compile-schemas /usr/share/glib-2.0/schemas/
-    einfo "For full functionality, ensure xdg-desktop-portal and xdg-desktop-portal-gtk are running (e.g., 'systemctl --user start xdg-desktop-portal.service xdg-desktop-portal-gtk.service')."
+    glib-compile-schemas /usr/share/glib-2.0/schemas/ || die "Schema compilation failed"
+    einfo "For full functionality, ensure xdg-desktop-portal and xdg-desktop-portal-gtk are running."
+    einfo "Start them with: 'systemctl --user start xdg-desktop-portal.service xdg-desktop-portal-gtk.service'"
+    einfo "If bottle creation fails, check '~/.local/share/bottles/' permissions and terminal output."
 }
