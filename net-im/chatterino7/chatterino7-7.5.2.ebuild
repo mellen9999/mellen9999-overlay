@@ -26,6 +26,7 @@ RDEPEND="
     dev-qt/qtimageformats:6
     dev-qt/qtsvg:6
     media-libs/libavif
+    net-im/libcommuni
     llvm? ( llvm-core/clang llvm-core/llvm )
 "
 
@@ -40,17 +41,14 @@ src_configure() {
         -DBUILD_TESTS=OFF
         -DBUILD_BENCHMARKS=OFF
         -DCHATTERINO_UPDATER=OFF
-        -DUSE_SYSTEM_LIBCOMMUNI=OFF
-        -DUSE_SYSTEM_QTKEYCHAIN=OFF
+        -DUSE_SYSTEM_LIBCOMMUNI=ON
+        -DUSE_SYSTEM_QTKEYCHAIN=ON
         -DUSE_SYSTEM_PAJLADA_SETTINGS=OFF
     )
 
     if use llvm; then
         CC="clang"
         CXX="clang++"
-        AR="llvm-ar"
-        NM="llvm-nm"
-        RANLIB="llvm-ranlib"
     else
         CFLAGS="${CFLAGS} -fno-lto"
         CXXFLAGS="${CXXFLAGS} -fno-lto"
