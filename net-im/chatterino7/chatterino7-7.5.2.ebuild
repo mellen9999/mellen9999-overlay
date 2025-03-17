@@ -15,7 +15,6 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 
-
 RDEPEND="
     app-crypt/libsecret
     =dev-libs/boost-1.86.0-r1
@@ -27,7 +26,7 @@ RDEPEND="
     dev-qt/qtsvg:6
     media-libs/libavif
     net-im/libcommuni
-    llvm? ( llvm-core/clang llvm-core/llvm )
+    llvm? ( sys-devel/clang sys-devel/llvm )
 "
 
 DEPEND="${RDEPEND}"
@@ -36,6 +35,7 @@ BDEPEND="
     dev-vcs/git
     dev-build/cmake
 "
+
 src_configure() {
     local mycmakeargs=(
         -DBUILD_TESTS=OFF
@@ -44,17 +44,26 @@ src_configure() {
         -DUSE_SYSTEM_LIBCOMMUNI=ON
         -DUSE_SYSTEM_QTKEYCHAIN=ON
         -DUSE_SYSTEM_PAJLADA_SETTINGS=OFF
+        -DLIBCOMMUNI_ROOT=/usr
+        -DIrcCore_LIBRARY=/usr/lib64/libIrcCore.so
+        -DIrcModel_LIBRARY=/usr/lib64/libIrcModel.so
+        -DIrcUtil_LIBRARY=/usr/lib64/libIrcUtil.so
+        -DIrcCore_INCLUDE_DIR=/usr/include/qt6/Communi/IrcCore
+        -DIrcModel_INCLUDE_DIR=/usr/include/qt6/Communi/IrcModel
+        -DIrcUtil_INCLUDE_DIR=/usr/include/qt6/Communi/IrcUtil
     )
 
     if use llvm; then
         CC="clang"
         CXX="clang++"
+        AR="llvm-ar"
+        NM="llvm-nm"
+        RANLIB="llvm-ranlib"
     else
         CFLAGS="${CFLAGS} -fno-lto"
         CXXFLAGS="${CXXFLAGS} -fno-lto"
         LDFLAGS="${LDFLAGS} -fno-lto"
     fi
-
 
     cmake_src_configure "${mycmakeargs[@]}"
 }
