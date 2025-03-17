@@ -51,6 +51,7 @@ src_configure() {
         -DIrcCore_INCLUDE_DIR=/usr/include/qt6/Communi/IrcCore
         -DIrcModel_INCLUDE_DIR=/usr/include/qt6/Communi/IrcModel
         -DIrcUtil_INCLUDE_DIR=/usr/include/qt6/Communi/IrcUtil
+        -DQt5Compat_DIR=/usr/lib64/cmake/Qt6Compat
     )
 
     if use llvm; then
