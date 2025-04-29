@@ -20,16 +20,15 @@ DEPEND="
     dev-qt/qtmultimedia:6
     dev-qt/qtsvg:6
     media-libs/libavif
-    net-im/libcommuni
 "
+BDEPEND="dev-vcs/git"
 RDEPEND="${DEPEND}"
 
 S="${WORKDIR}/${P}"
 
 src_prepare() {
     cmake_src_prepare
-    # Use system libcommuni
-    sed -i '/add_subdirectory.*libcommuni/d' CMakeLists.txt
+    git submodule update --init --recursive
 }
 
 src_configure() {
