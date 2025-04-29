@@ -9,24 +9,24 @@ SRC_URI="https://github.com/SevenTV/chatterino7/archive/refs/tags/v${PV}.tar.gz 
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE=""
 
 DEPEND="
     app-crypt/libsecret
-    dev-libs/boost
-    dev-libs/openssl
+    dev-libs/boost:=
+    dev-libs/openssl:=
     dev-libs/qtkeychain
-    dev-qt/qtbase:6
     dev-qt/qt5compat:6
-    dev-qt/qtimageformats:6
+    dev-qt/qtcore:6
+    dev-qt/qtgui:6[wayland]
+    dev-qt/qtmultimedia:6
     dev-qt/qtsvg:6
-    dev-qt/qttools:6
+    dev-qt/qtnetwork:6
     media-libs/libavif
     net-im/libcommuni
 "
 RDEPEND="${DEPEND}"
 
-S="${WORKDIR}/chatterino6-${PV}"
+S="${WORKDIR}/${P}"
 
 src_configure() {
     cmake_src_configure
