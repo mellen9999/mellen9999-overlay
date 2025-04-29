@@ -12,15 +12,14 @@ KEYWORDS="~amd64"
 IUSE=""
 
 DEPEND="
-    dev-qt/qtcore:6
-    dev-qt/qtgui:6[wayland]
-    dev-qt/qtwidgets:6
-    dev-qt/qtmultimedia:6
-    dev-qt/qtsvg:6
-    dev-qt/qtnetwork:6
-    dev-libs/openssl:=
-    dev-libs/boost:=
-    gui-libs/libadwaita
+    app-crypt/libsecret
+    dev-libs/boost
+    dev-libs/openssl
+    dev-libs/qtkeychain
+    dev-qt/qt5compat:6
+    dev-qt/qtimageformats:6
+    media-libs/libavif
+    net-im/libcommuni
 "
 RDEPEND="${DEPEND}"
 
