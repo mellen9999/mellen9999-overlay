@@ -16,7 +16,7 @@ DEPEND="
     dev-libs/openssl:=
     dev-libs/qtkeychain
     dev-qt/qt5compat:6
-    dev-qt/qtcore:6
+    dev-qt/qtbase:6
     dev-qt/qtgui:6[wayland]
     dev-qt/qtmultimedia:6
     dev-qt/qtsvg:6
