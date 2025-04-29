@@ -16,14 +16,17 @@ DEPEND="
     dev-libs/boost
     dev-libs/openssl
     dev-libs/qtkeychain
+    dev-qt/qtbase:6
     dev-qt/qt5compat:6
     dev-qt/qtimageformats:6
+    dev-qt/qtsvg:6
+    dev-qt/qttools:6
     media-libs/libavif
     net-im/libcommuni
 "
 RDEPEND="${DEPEND}"
 
-S="${WORKDIR}/chatterino7-${PV}"
+S="${WORKDIR}/chatterino6-${PV}"
 
 src_configure() {
     cmake_src_configure
