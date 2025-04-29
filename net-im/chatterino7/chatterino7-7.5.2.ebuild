@@ -12,15 +12,13 @@ KEYWORDS="~amd64"
 
 DEPEND="
     app-crypt/libsecret
-    dev-libs/boost:=
-    dev-libs/openssl:=
+    dev-libs/boost
+    dev-libs/openssl
     dev-libs/qtkeychain
     dev-qt/qt5compat:6
     dev-qt/qtbase:6
-    dev-qt/qtgui:6[wayland]
-    dev-qt/qtmultimedia:6
+    dev-qt/qtwayland:6
     dev-qt/qtsvg:6
-    dev-qt/qtnetwork:6
     media-libs/libavif
     net-im/libcommuni
 "
