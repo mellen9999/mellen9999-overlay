@@ -12,12 +12,12 @@ KEYWORDS="~amd64"
 
 DEPEND="
     app-crypt/libsecret
-    dev-libs/boost
-    dev-libs/openssl
+    dev-libs/boost:=
+    dev-libs/openssl:=
     dev-libs/qtkeychain
     dev-qt/qt5compat:6
-    dev-qt/qtbase:6
-    dev-qt/qtwayland:6
+    dev-qt/qtbase:6[gui,network,wayland]
+    dev-qt/qtmultimedia:6
     dev-qt/qtsvg:6
     media-libs/libavif
     net-im/libcommuni
@@ -25,6 +25,12 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 S="${WORKDIR}/${P}"
+
+src_prepare() {
+    cmake_src_prepare
+    # Use system libcommuni
+    sed -i '/add_subdirectory.*libcommuni/d' CMakeLists.txt
+}
 
 src_configure() {
     cmake_src_configure
