@@ -24,6 +24,7 @@ DEPEND="
     dev-qt/qtimageformats:6
     dev-qt/qtsvg:6
     media-libs/libavif
+    net-im/libcommuni
 "
 BDEPEND="dev-vcs/git"
 RDEPEND="${DEPEND}"
@@ -39,8 +40,8 @@ src_configure() {
         -DBUILD_TESTS=OFF
         -DBUILD_BENCHMARKS=OFF
         -DCHATTERINO_UPDATER=OFF
-        -DUSE_SYSTEM_LIBCOMMUNI=OFF
-        -DUSE_SYSTEM_QTKEYCHAIN=OFF
+        -DUSE_SYSTEM_LIBCOMMUNI=ON
+        -DUSE_SYSTEM_QTKEYCHAIN=ON
         -DUSE_SYSTEM_PAJLADA_SETTINGS=OFF
     )
     cmake_src_configure "${mycmakeargs[@]}"
