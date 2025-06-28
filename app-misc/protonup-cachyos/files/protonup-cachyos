@@ -1,0 +1,82 @@
+#!/bin/bash
+set -euo pipefail
+
+# Block root use
+if [[ "$EUID" -eq 0 ]]; then
+    echo "[-] Do not run this script as root. Please run it as a regular user."
+    exit 1
+fi
+
+echo "[*] Running as user: $USER"
+
+# Detect best Steam installation directory
+if [[ -d "$HOME/.steam/root/compatibilitytools.d" ]]; then
+    INSTALL_DIR="$HOME/.steam/root/compatibilitytools.d"
+else
+    INSTALL_DIR="$HOME/.local/share/Steam/compatibilitytools.d"
+fi
+mkdir -p "$INSTALL_DIR"
+echo "[*] Proton will be installed to: $INSTALL_DIR"
+
+REPO="CachyOS/proton-cachyos"
+
+# CPU feature detection for v3 support
+echo "[*] Detecting CPU capabilities..."
+CPU_FLAGS=$(grep -m1 '^flags' /proc/cpuinfo)
+
+if echo "$CPU_FLAGS" | grep -qwE 'avx2' && \
+   echo "$CPU_FLAGS" | grep -qwE 'bmi1' && \
+   echo "$CPU_FLAGS" | grep -qwE 'bmi2' && \
+   echo "$CPU_FLAGS" | grep -qwE 'fma'; then
+    ARCH="x86_64_v3"
+else
+    ARCH="x86_64"
+fi
+echo "[*] Selected architecture: $ARCH"
+
+# Fetch latest release info
+echo "[*] Fetching latest release from GitHub..."
+API_URL="https://api.github.com/repos/${REPO}/releases/latest"
+RELEASE_DATA=$(curl -s "$API_URL")
+
+TAG=$(echo "$RELEASE_DATA" | jq -r '.tag_name')
+echo "[*] Latest release: $TAG"
+
+ASSET_URL=$(echo "$RELEASE_DATA" | jq -r \
+    --arg arch "$ARCH" \
+    '.assets[] | select(.name | test($arch + "\\.tar\\.xz$")) | .browser_download_url')
+
+if [[ -z "$ASSET_URL" ]]; then
+    echo "[-] No matching asset found for architecture '$ARCH'."
+    exit 1
+fi
+
+ASSET_NAME=$(basename "$ASSET_URL")
+INSTALL_NAME="${ASSET_NAME%.tar.xz}"
+INSTALL_PATH="${INSTALL_DIR}/${INSTALL_NAME}"
+
+if [[ -d "$INSTALL_PATH" ]]; then
+    echo "[✓] Already installed: $INSTALL_NAME"
+    exit 0
+fi
+
+echo "[*] Downloading $ASSET_NAME..."
+TMP_DIR=$(mktemp -d)
+cd "$TMP_DIR"
+curl -LO "$ASSET_URL"
+
+echo "[*] Extracting..."
+tar -xf "$ASSET_NAME"
+DIR_NAME=$(find . -maxdepth 1 -type d ! -name '.' | head -n1)
+
+mv "$DIR_NAME" "$INSTALL_PATH"
+echo "[+] Installed new version: $INSTALL_NAME"
+
+# Clean up older versions
+echo "[*] Cleaning up older versions..."
+find "$INSTALL_DIR" -maxdepth 1 -type d -name 'proton-cachyos-*' ! -path "$INSTALL_PATH" -exec rm -rf {} +
+echo "[✓] Done. Restart Steam to use the new version."
+
+# Remove temporary files
+rm -rf "$TMP_DIR"
+
