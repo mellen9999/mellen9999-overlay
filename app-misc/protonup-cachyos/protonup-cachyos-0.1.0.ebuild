@@ -1,6 +1,6 @@
 EAPI=8
 
-inherit cargo git-r3
+inherit cargo rust
 
 DESCRIPTION="tool to install latest protonup-cachyos"
 HOMEPAGE="https://github.com/CachyOS/ProtonUp-Qt"
@@ -16,12 +16,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
-# Ensure we use crates.io as the source, not offline overlays
 CARGO_SRC_DIR="${S}"
-
-src_unpack() {
-    default
-}
 
 src_prepare() {
     default
@@ -33,3 +28,4 @@ src_compile() {
     export CARGO_NET_OFFLINE=0
     cargo_src_compile
 }
+
