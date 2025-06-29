@@ -1,0 +1,228 @@
+# copyright 2025 mellen9999
+# distributed under the terms of the gnu general public license v2
+
+EAPI=8
+
+inherit cargo
+
+DESCRIPTION="tool for installing latest proton-cachyos"
+HOMEPAGE="https://github.com/mellen9999/protonup-cachyos"
+SRC_URI="https://github.com/mellen9999/protonup-cachyos/archive/0.1.0.tar.gz -> ${P}.tar.gz
+         ${CARGO_CRATE_URIS}"
+LICENSE="MIT"
+SLOT="0"
+KEYWORDS="~amd64"
+
+DEPEND="
+        dev-lang/rust
+        virtual/rust
+"
+RDEPEND="${DEPEND}"
+
+CRATES="
+        addr2line@0.24.2
+        adler2@2.0.1
+        aho-corasick@1.1.3
+        anyhow@1.0.98
+        atomic-waker@1.1.2
+        backtrace@0.3.75
+        base64@0.22.1
+        bitflags@2.9.1
+        bumpalo@3.19.0
+        bytes@1.10.1
+        cc@1.2.27
+        cfg-if@1.0.1
+        cfg_aliases@0.1.1
+        core-foundation-sys@0.8.7
+        core-foundation@0.9.4
+        dirs-sys@0.4.1
+        dirs@5.0.1
+        displaydoc@0.2.5
+        encoding_rs@0.8.35
+        equivalent@1.0.2
+        errno@0.3.13
+        fastrand@2.3.0
+        filetime@0.2.25
+        fnv@1.0.7
+        foreign-types-shared@0.1.1
+        foreign-types@0.3.2
+        form_urlencoded@1.2.1
+        futures-channel@0.3.31
+        futures-core@0.3.31
+        futures-io@0.3.31
+        futures-sink@0.3.31
+        futures-task@0.3.31
+        futures-util@0.3.31
+        getrandom@0.2.16
+        getrandom@0.3.3
+        gimli@0.31.1
+        h2@0.4.10
+        hashbrown@0.15.4
+        http-body-util@0.1.3
+        http-body@1.0.1
+        http@1.3.1
+        httparse@1.10.1
+        hyper-rustls@0.27.7
+        hyper-tls@0.6.0
+        hyper-util@0.1.14
+        hyper@1.6.0
+        icu_collections@2.0.0
+        icu_locale_core@2.0.0
+        icu_normalizer@2.0.0
+        icu_normalizer_data@2.0.0
+        icu_properties@2.0.1
+        icu_properties_data@2.0.1
+        icu_provider@2.0.0
+        idna@1.0.3
+        idna_adapter@1.2.1
+        indexmap@2.10.0
+        ipnet@2.11.0
+        iri-string@0.7.8
+        itoa@1.0.15
+        js-sys@0.3.77
+        libc@0.2.174
+        libredox@0.1.4
+        linux-raw-sys@0.9.4
+        litemap@0.8.0
+        log@0.4.27
+        lzma-sys@0.1.20
+        memchr@2.7.5
+        mime@0.3.17
+        miniz_oxide@0.8.9
+        mio@1.0.4
+        native-tls@0.2.14
+        nix@0.28.0
+        object@0.36.7
+        once_cell@1.21.3
+        openssl-macros@0.1.1
+        openssl-probe@0.1.6
+        openssl-sys@0.9.109
+        openssl@0.10.73
+        option-ext@0.2.0
+        percent-encoding@2.3.1
+        pin-project-lite@0.2.16
+        pin-utils@0.1.0
+        pkg-config@0.3.32
+        potential_utf@0.1.2
+        proc-macro2@1.0.95
+        quote@1.0.40
+        r-efi@5.3.0
+        redox_syscall@0.5.13
+        redox_users@0.4.6
+        regex-automata@0.4.9
+        regex-syntax@0.8.5
+        regex@1.11.1
+        reqwest@0.12.20
+        ring@0.17.14
+        rustc-demangle@0.1.25
+        rustix@1.0.7
+        rustls-pki-types@1.12.0
+        rustls-webpki@0.103.3
+        rustls@0.23.28
+        rustversion@1.0.21
+        ryu@1.0.20
+        same-file@1.0.6
+        schannel@0.1.27
+        security-framework-sys@2.14.0
+        security-framework@2.11.1
+        serde@1.0.219
+        serde_derive@1.0.219
+        serde_json@1.0.140
+        serde_urlencoded@0.7.1
+        shlex@1.3.0
+        slab@0.4.10
+        smallvec@1.15.1
+        socket2@0.5.10
+        stable_deref_trait@1.2.0
+        subtle@2.6.1
+        syn@2.0.104
+        sync_wrapper@1.0.2
+        synstructure@0.13.2
+        system-configuration-sys@0.6.0
+        system-configuration@0.6.1
+        tar@0.4.44
+        tempfile@3.20.0
+        thiserror-impl@1.0.69
+        thiserror@1.0.69
+        tinystr@0.8.1
+        tokio-native-tls@0.3.1
+        tokio-rustls@0.26.2
+        tokio-util@0.7.15
+        tokio@1.45.1
+        tower-http@0.6.6
+        tower-layer@0.3.3
+        tower-service@0.3.3
+        tower@0.5.2
+        tracing-core@0.1.34
+        tracing@0.1.41
+        try-lock@0.2.5
+        unicode-ident@1.0.18
+        untrusted@0.9.0
+        url@2.5.4
+        utf8_iter@1.0.4
+        vcpkg@0.2.15
+        walkdir@2.5.0
+        want@0.3.1
+        wasi@0.11.1+wasi-snapshot-preview1
+        wasi@0.14.2+wasi-0.2.4
+        wasm-bindgen-backend@0.2.100
+        wasm-bindgen-futures@0.4.50
+        wasm-bindgen-macro-support@0.2.100
+        wasm-bindgen-macro@0.2.100
+        wasm-bindgen-shared@0.2.100
+        wasm-bindgen@0.2.100
+        web-sys@0.3.77
+        winapi-util@0.1.9
+        windows-link@0.1.3
+        windows-registry@0.5.3
+        windows-result@0.3.4
+        windows-strings@0.4.2
+        windows-sys@0.48.0
+        windows-sys@0.52.0
+        windows-sys@0.59.0
+        windows-sys@0.60.2
+        windows-targets@0.48.5
+        windows-targets@0.52.6
+        windows-targets@0.53.2
+        windows_aarch64_gnullvm@0.48.5
+        windows_aarch64_gnullvm@0.52.6
+        windows_aarch64_gnullvm@0.53.0
+        windows_aarch64_msvc@0.48.5
+        windows_aarch64_msvc@0.52.6
+        windows_aarch64_msvc@0.53.0
+        windows_i686_gnu@0.48.5
+        windows_i686_gnu@0.52.6
+        windows_i686_gnu@0.53.0
+        windows_i686_gnullvm@0.52.6
+        windows_i686_gnullvm@0.53.0
+        windows_i686_msvc@0.48.5
+        windows_i686_msvc@0.52.6
+        windows_i686_msvc@0.53.0
+        windows_x86_64_gnu@0.48.5
+        windows_x86_64_gnu@0.52.6
+        windows_x86_64_gnu@0.53.0
+        windows_x86_64_gnullvm@0.48.5
+        windows_x86_64_gnullvm@0.52.6
+        windows_x86_64_gnullvm@0.53.0
+        windows_x86_64_msvc@0.48.5
+        windows_x86_64_msvc@0.52.6
+        windows_x86_64_msvc@0.53.0
+        wit-bindgen-rt@0.39.0
+        writeable@0.6.1
+        xattr@1.5.1
+        xz2@0.1.7
+        yoke-derive@0.8.0
+        yoke@0.8.0
+        zerofrom-derive@0.1.6
+        zerofrom@0.1.6
+        zeroize@1.8.1
+        zerotrie@0.2.2
+        zerovec-derive@0.11.1
+        zerovec@0.11.2
+"
+S="${WORKDIR}/${P}"
+
+src_unpack() {
+        unpack ${P}.tar.gz
+        cargo_src_unpack
+}
