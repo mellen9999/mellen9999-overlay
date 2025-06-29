@@ -5,7 +5,7 @@ EAPI=8
 
 inherit cargo
 
-DESCRIPTION="Install and manage custom versions of Proton-GE and Wine-GE"
+DESCRIPTION="tool to install latest proton-cachyos"
 HOMEPAGE="https://github.com/CachyOS/ProtonUp-CachyOS"
 SRC_URI="https://github.com/CachyOS/ProtonUp-CachyOS/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="MIT"
@@ -13,7 +13,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
 
-BDEPEND="virtual/rust"
+BDEPEND="dev-lang/rust-bin"
 
 CARGO_SRC_DIR="${S}"
 
