@@ -2,7 +2,7 @@ EAPI=8
 
 inherit cargo git-r3
 
-DESCRIPTION="AUR-inspired ProtonUp fork from CachyOS"
+DESCRIPTION="tool to install latest protonup-cachyos"
 HOMEPAGE="https://github.com/CachyOS/ProtonUp-Qt"
 SRC_URI="https://github.com/CachyOS/ProtonUp-Qt/archive/refs/tags/v0.1.0.tar.gz -> ${P}.tar.gz"
 
@@ -25,6 +25,7 @@ src_unpack() {
 
 src_prepare() {
     default
+    cargo_gen_config
     cargo_src_prepare
 }
 
