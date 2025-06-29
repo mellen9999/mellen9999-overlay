@@ -14,7 +14,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="
-        dev-lang/rust
+        dev-lang/rust-bin
 "
 RDEPEND="${DEPEND}"
 
