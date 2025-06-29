@@ -15,7 +15,6 @@ KEYWORDS="~amd64"
 
 DEPEND="
         dev-lang/rust
-        virtual/rust
 "
 RDEPEND="${DEPEND}"
 
