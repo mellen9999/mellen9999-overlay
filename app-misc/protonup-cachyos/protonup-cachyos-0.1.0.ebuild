@@ -29,3 +29,7 @@ src_prepare() {
     cargo_src_prepare
 }
 
+src_compile() {
+    export CARGO_NET_OFFLINE=0
+    cargo_src_compile
+}
