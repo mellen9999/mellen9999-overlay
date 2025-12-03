@@ -8,7 +8,7 @@ inherit cmake git-r3 multilib
 DESCRIPTION="Chat client for Twitch.tv"
 HOMEPAGE="https://chatterino.com"
 EGIT_REPO_URI="https://github.com/SevenTV/chatterino7.git"
-EGIT_COMMIT="e57eba779dab05fbd3e47dcadacd0b841d8959a7"  # Release v7.5.3
+EGIT_COMMIT="ddc4d3357aedbafe0883c298aeadceb31099ffea"  # Release v7.5.4
 
 LICENSE="MIT"
 SLOT="0"
