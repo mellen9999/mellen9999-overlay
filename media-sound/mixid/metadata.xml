@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>mellen9999@example.com</email>
+		<name>mellen9999</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">TheOnlyJoey/MixiD</remote-id>
+		<bugs-to>https://github.com/TheOnlyJoey/MixiD/issues</bugs-to>
+	</upstream>
+	<longdescription>
+		MixiD is an unofficial Linux control panel for Audient iD series
+		audio interfaces. It provides mixer controls, phantom power settings,
+		and input/output routing for devices including iD4, iD14, iD22, iD24,
+		and iD48 (including MKII variants).
+	</longdescription>
+</pkgmetadata>
