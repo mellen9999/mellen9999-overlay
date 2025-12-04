@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit cmake
+inherit cmake udev
 
 DESCRIPTION="Unofficial Linux control panel for Audient iD series audio interfaces"
 HOMEPAGE="https://github.com/TheOnlyJoey/MixiD"
@@ -22,10 +22,12 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
+	acct-group/plugdev
 	dev-libs/libusb:1
 	media-libs/glew:0=
 	media-libs/glfw:0=
 	virtual/opengl
+	virtual/udev
 "
 DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
@@ -54,9 +56,14 @@ src_install() {
 	dobin "${BUILD_DIR}"/MixiD
 
 	# Install udev rules for USB device access
-	insinto /usr/lib/udev/rules.d
-	newins - 70-audient.rules <<-EOF
-		# Audient iD series interfaces
-		SUBSYSTEM=="usb", ATTR{idVendor}=="2708", MODE="0666"
-	EOF
+	udev_dorules "${FILESDIR}"/70-audient.rules
+}
+
+pkg_postinst() {
+	udev_reload
+
+	elog "To use MixiD without root, your user must be in the 'plugdev' group:"
+	elog "  usermod -aG plugdev \$USER"
+	elog ""
+	elog "You may need to replug your Audient device or reboot for udev rules to apply."
 }
